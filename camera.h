@@ -13,6 +13,10 @@
 #define CAMERAH
 #include "ray.h"
 
+#ifdef _WIN32
+#include "drand48.h"
+#endif
+
 vec3 random_in_unit_disk() {
     vec3 p;
     do {

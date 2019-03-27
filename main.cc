@@ -9,17 +9,25 @@
 // with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 //==================================================================================================
 
+#include <chrono>
+#include <string>
+#include <fstream>
 #include <iostream>
+
 #include "sphere.h"
 #include "hitable_list.h"
 #include "float.h"
 #include "camera.h"
 #include "material.h"
 
+// https://gist.github.com/mortennobel/8665258
+#ifdef _WIN32
+#include "drand48.h"
+#endif
 
 vec3 color(const ray& r, hitable *world, int depth) {
     hit_record rec;
-    if (world->hit(r, 0.001, MAXFLOAT, rec)) { 
+    if (world->hit(r, 0.001, FLT_MAX, rec)) {
         ray scattered;
         vec3 attenuation;
         if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
@@ -68,11 +76,65 @@ hitable *random_scene() {
     return new hitable_list(list,i);
 }
 
-int main() {
+void printUsageAndExit(const std::string& argv0)
+{
+    std::cerr << "\nUsage: " << argv0 << " [options]\n";
+    std::cerr <<
+        "App Options:\n"
+        " --width              Render width\n"
+        " --height             Render height\n"
+        " --ns                 Number of samples per pixel\n"
+        << std::endl;
+
+    exit(1);
+}
+
+int main( int argc, char** argv ) {
     int nx = 1200;
     int ny = 800;
     int ns = 10;
-    std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+
+    for (int i = 1; i < argc; ++i)
+    {
+        const std::string arg(argv[i]);
+
+        if (arg == "-h" || arg == "--help")
+        {
+            printUsageAndExit(argv[0]);
+        }
+        else if (arg == "--width")
+        {
+            if (i == argc - 1)
+            {
+                std::cerr << "Option '" << arg << "' requires additional argument.\n";
+                printUsageAndExit(argv[0]);
+            }
+            nx = atoi(argv[++i]);
+        }
+        else if (arg == "--height")
+        {
+            if (i == argc - 1)
+            {
+                std::cerr << "Option '" << arg << "' requires additional argument.\n";
+                printUsageAndExit(argv[0]);
+            }
+            ny = atoi(argv[++i]);
+        }
+        else if (arg == "--ns")
+        {
+            if (i == argc - 1)
+            {
+                std::cerr << "Option '" << arg << "' requires additional argument.\n";
+                printUsageAndExit(argv[0]);
+            }
+            ns = atoi(argv[++i]);
+        }
+    }
+
+    std::ofstream file;
+    file.open("out.ppm", std::ios::out);
+    file << "P3\n" << nx << " " << ny << "\n255\n";
+
     hitable *list[5];
     float R = cos(M_PI/4);
     list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.1, 0.2, 0.5)));
@@ -83,6 +145,8 @@ int main() {
     hitable *world = new hitable_list(list,5);
     world = random_scene();
 
+    int* buffer = new int[3 * nx*ny];
+
     vec3 lookfrom(13,2,3);
     vec3 lookat(0,0,0);
     float dist_to_focus = 10.0;
@@ -90,7 +154,10 @@ int main() {
 
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
 
-    for (int j = ny-1; j >= 0; j--) {
+    auto start = std::chrono::high_resolution_clock::now();
+    #pragma omp parallel for schedule(dynamic, 1)
+    for (int j = ny - 1; j >= 0; j--) {
+        fprintf(stdout, "\rRendering %5.2f%%", 100.0 * (ny-1-j) / (ny-1));
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
             for (int s=0; s < ns; s++) {
@@ -105,10 +172,22 @@ int main() {
             int ir = int(255.99*col[0]); 
             int ig = int(255.99*col[1]); 
             int ib = int(255.99*col[2]); 
-            std::cout << ir << " " << ig << " " << ib << "\n";
+
+            buffer[3*(i + (ny-1-j) * nx)+0] = ir;
+            buffer[3*(i + (ny-1-j) * nx)+1] = ig;
+            buffer[3*(i + (ny-1-j) * nx)+2] = ib;
         }
     }
+    fprintf(stdout, "\n");
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> delta = stop - start;
+    std::cout << "Render time: " << delta.count() / 1000.0 << " sec" << std::endl;
+
+    std::cout << "Saving result to out.ppm" << std::endl;
+    for (int pixel = 0; pixel < nx*ny; ++pixel)
+    {
+        file << buffer[3 * pixel + 0] << " " << buffer[3 * pixel + 1] << " " << buffer[3 * pixel + 2] << "\n";
+    }
+    std::cout << "Done!" << std::endl;
 }
-
-
-

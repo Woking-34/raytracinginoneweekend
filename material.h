@@ -17,6 +17,9 @@ struct hit_record;
 #include "ray.h"
 #include "hitable.h"
 
+#ifdef _WIN32
+#include "drand48.h"
+#endif
 
 float schlick(float cosine, float ref_idx) {
     float r0 = (1-ref_idx) / (1+ref_idx);
