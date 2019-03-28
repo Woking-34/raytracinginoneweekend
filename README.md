@@ -1,11 +1,11 @@
 Ray Tracing in One Weekend
 ====================================================================================================
 
-![Ray Tracing in One Weekend](./out.jpg)
+![Ray Tracing in One Weekend](./rtow.jpg)
 
 ## Changes
 - CMake project & build support
-- Visual Studio compile fixes
+- MSVC compatibility fixes
 - simple "stdout progress bar", simple chrono time measurement, save output ppm directly to file
 - command line arguments for render parameters/configuration
 - OpenMP support for multicore processing
@@ -28,3 +28,7 @@ Render time: 24.0868 sec
 Saving result to out.ppm
 Done!
 ```
+
+## References
+ - [petershirley - raytracinginoneweekend](https://github.com/petershirley/raytracinginoneweekend)
+ - [rogerallen - raytracinginoneweekendincuda](https://github.com/rogerallen/raytracinginoneweekendincuda)

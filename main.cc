@@ -132,7 +132,7 @@ int main( int argc, char** argv ) {
     }
 
     std::ofstream file;
-    file.open("out.ppm", std::ios::out);
+    file.open("rtow.ppm", std::ios::out);
     file << "P3\n" << nx << " " << ny << "\n255\n";
 
     hitable *list[5];
