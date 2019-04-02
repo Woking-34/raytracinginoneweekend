@@ -41,5 +41,9 @@ set(RTOW_SRC
 
 add_executable(rtow ${RTOW_SRC})
 
+add_subdirectory(rtow_ch06_antialiasing)
 add_subdirectory(rtow_ch07_diffuse)
 add_subdirectory(rtow_ch08_metal)
+add_subdirectory(rtow_ch09_dielectrics)
+add_subdirectory(rtow_ch10_camera)
+add_subdirectory(rtow_ch11_defocus)
