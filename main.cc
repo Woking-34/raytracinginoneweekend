@@ -56,11 +56,25 @@ hitable *random_scene() {
             vec3 center(a+0.9*drand48(),0.2,b+0.9*drand48()); 
             if ((center-vec3(4,0.2,0)).length() > 0.9) { 
                 if (choose_mat < 0.8) {  // diffuse
-                    list[i++] = new sphere(center, 0.2, new lambertian(vec3(drand48()*drand48(), drand48()*drand48(), drand48()*drand48())));
+
+                    float r0 = drand48();
+                    float r1 = drand48();
+                    float r2 = drand48();
+                    float r3 = drand48();
+                    float r4 = drand48();
+                    float r5 = drand48();
+
+                    list[i++] = new sphere(center, 0.2, new lambertian(vec3(r0*r1, r2*r3, r4*r5)));
                 }
                 else if (choose_mat < 0.95) { // metal
+
+                    float r0 = drand48();
+                    float r1 = drand48();
+                    float r2 = drand48();
+                    float r3 = drand48();
+
                     list[i++] = new sphere(center, 0.2,
-                            new metal(vec3(0.5*(1 + drand48()), 0.5*(1 + drand48()), 0.5*(1 + drand48())),  0.5*drand48()));
+                            new metal(vec3(0.5*(1 + r0), 0.5*(1 + r1), 0.5*(1 + r2)),  0.5*r3));
                 }
                 else {  // glass
                     list[i++] = new sphere(center, 0.2, new dielectric(1.5));
