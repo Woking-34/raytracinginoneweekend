@@ -14,6 +14,10 @@
 #include <fstream>
 #include <iostream>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include "sphere.h"
 #include "hitable_list.h"
 #include "float.h"
@@ -144,6 +148,15 @@ int main( int argc, char** argv ) {
             ns = atoi(argv[++i]);
         }
     }
+
+    std::cout << "Render width: " << nx << std::endl;
+    std::cout << "Render height: " << ny << std::endl;
+    std::cout << "Number of samples per pixel: " << ns << std::endl << std::endl;
+
+#ifdef _OPENMP
+    int thread_num = omp_get_max_threads();
+    std::cout << "omp_get_max_threads: " << thread_num << std::endl << std::endl;
+#endif
 
     std::ofstream file;
     file.open("rtow.ppm", std::ios::out);

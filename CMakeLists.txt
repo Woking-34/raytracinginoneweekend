@@ -16,17 +16,10 @@ if(${CXX_COMPILER_ID_UPPER} STREQUAL MSVC)
 endif()
 
 IF(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 	add_definitions(-DNOMINMAX)
 	add_definitions(-D_USE_MATH_DEFINES)
 ENDIF(WIN32)
-
-IF(UNIX AND NOT APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-ENDIF(UNIX AND NOT APPLE)
 
 set(RTOW_SRC
 	camera.h
@@ -39,7 +32,16 @@ set(RTOW_SRC
 	vec3.h
 )
 
-add_executable(rtow ${RTOW_SRC})
+add_executable(rtow_ch12 ${RTOW_SRC})
+add_executable(rtow_ch12_omp ${RTOW_SRC})
+
+IF(WIN32)
+	set_target_properties(rtow_ch12_omp PROPERTIES COMPILE_FLAGS "/openmp")
+ENDIF(WIN32)
+IF(UNIX AND NOT APPLE)
+	set_target_properties(rtow_ch12_omp PROPERTIES COMPILE_FLAGS "-fopenmp") 
+ENDIF(UNIX AND NOT APPLE)
+
 
 add_subdirectory(rtow_ch06_antialiasing)
 add_subdirectory(rtow_ch07_diffuse)
