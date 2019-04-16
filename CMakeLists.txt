@@ -39,7 +39,8 @@ IF(WIN32)
 	set_target_properties(rtow_ch12_omp PROPERTIES COMPILE_FLAGS "/openmp")
 ENDIF(WIN32)
 IF(UNIX AND NOT APPLE)
-	set_target_properties(rtow_ch12_omp PROPERTIES COMPILE_FLAGS "-fopenmp") 
+	set_target_properties(rtow_ch12_omp PROPERTIES COMPILE_FLAGS "-fopenmp")
+	set_target_properties(rtow_ch12_omp PROPERTIES LINK_FLAGS "-fopenmp")
 ENDIF(UNIX AND NOT APPLE)
 
 
